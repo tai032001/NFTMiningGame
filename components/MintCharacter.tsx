@@ -25,7 +25,6 @@ export const MintCharacter = () => {
       <p>Claim character to play mining game</p>
       {nfts?.map((value, index) => (
         <div className={`${styles.nftBox} ${styles.spacerBottom}`} key={index}>
-          {/* <div key={index}></div> */}
           <ThirdwebNftMedia metadata={value.metadata} height="200px" />
           <p style={{ textAlign: "center" }}>Name: {value.metadata.name}</p>
           <div className={styles.smallMargin}>
