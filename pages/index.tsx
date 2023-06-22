@@ -1,53 +1,61 @@
-import { ConnectWallet } from "@thirdweb-dev/react";
+import {
+  ConnectWallet,
+  useAddress,
+  useContract,
+  useOwnedNFTs,
+  useDisconnect,
+} from "@thirdweb-dev/react";
 import type { NextPage } from "next";
+import { CHARACTER } from "../const/contractAddress";
 import styles from "../styles/Home.module.css";
-
+import { useRouter } from "next/router";
+import { MintCharacter } from "../components/MintCharacter";
 const Home: NextPage = () => {
+  const address = useAddress();
+  const router = useRouter();
+  const disconnect = useDisconnect();
+  const { contract: editionDrop } = useContract(CHARACTER, "edition-drop");
+  const {
+    data: ownedNfts,
+    isLoading,
+    error,
+  } = useOwnedNFTs(editionDrop, address);
+  // console.log(ownedNfts);
+  // const disconnectWallet = () => {
+  //   disconnect();
+  // };
+  if (!address) {
+    return (
+      <div className={styles.container}>
+        <ConnectWallet />
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return <div className={styles.container}>Loading.....</div>;
+  }
+
+  if (!ownedNfts || error) {
+    return <div>Something went wrong</div>;
+  }
+
+  if (ownedNfts.length === 0) {
+    return (
+      <div className={styles.container}>
+        <MintCharacter />
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="http://thirdweb.com/">thirdweb</a>!
-        </h1>
-
-        <p className={styles.description}>
-          Get started by configuring your desired network in{" "}
-          <code className={styles.code}>pages/_app.tsx</code>, then modify the{" "}
-          <code className={styles.code}>pages/index.tsx</code> file!
-        </p>
-
-        <div className={styles.connect}>
-          <ConnectWallet />
-        </div>
-
-        <div className={styles.grid}>
-          <a href="https://portal.thirdweb.com/" className={styles.card}>
-            <h2>Portal &rarr;</h2>
-            <p>
-              Guides, references and resources that will help you build with
-              thirdweb.
-            </p>
-          </a>
-
-          <a href="https://thirdweb.com/dashboard" className={styles.card}>
-            <h2>Dashboard &rarr;</h2>
-            <p>
-              Deploy, configure and manage your smart contracts from the
-              dashboard.
-            </p>
-          </a>
-
-          <a
-            href="https://portal.thirdweb.com/templates"
-            className={styles.card}
-          >
-            <h2>Templates &rarr;</h2>
-            <p>
-              Discover and clone template projects showcasing thirdweb features.
-            </p>
-          </a>
-        </div>
-      </main>
+      <button
+        className={`${styles.mainButton} ${styles.spacerBottom}`}
+        onClick={() => router.push("/playGame")}
+      >
+        Start Game
+      </button>
     </div>
   );
 };
